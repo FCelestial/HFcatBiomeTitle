@@ -39,21 +39,50 @@ public class ResidenceManager {
     public void init() {
         PluginManager pm = plugin.getServer().getPluginManager();
 
-        // Dominion
+        // Dominion（尝试多种可能的 API 类名，兼容不同版本）
         if (pm.getPlugin("Dominion") != null) {
-            try {
-                Class<?> dominionApi = Class.forName("com.dominion.api.DominionAPI");
-                Method instanceMethod = dominionApi.getMethod("getInstance");
-                Object api = instanceMethod.invoke(null);
-                dominionGetClaim = dominionApi.getMethod("getClaim", Location.class);
-                if (dominionGetClaim != null) {
+            String[] dominionCandidates = {
+                "com.dominion.api.DominionAPI",
+                "com.dominion.api.Dominion",
+                "com.dominion.Dominion",
+                "com.dominion.DominionPlugin",
+                "com.griefdefender.api.GriefDefender"  // Dominion 基于 GriefDefender，可能沿用
+            };
+            for (String className : dominionCandidates) {
+                try {
+                    Class<?> clazz = Class.forName(className);
+                    // 查找 getInstance 或 getApi 方法
+                    Method instanceMethod = null;
+                    try {
+                        instanceMethod = clazz.getMethod("getInstance");
+                    } catch (NoSuchMethodException e1) {
+                        try {
+                            instanceMethod = clazz.getMethod("getApi");
+                        } catch (NoSuchMethodException e2) {
+                            continue;
+                        }
+                    }
+                    Object api = instanceMethod.invoke(null);
+                    // 查找 getClaim 或 getClaimAt 方法
+                    Method getClaim = null;
+                    try {
+                        getClaim = api.getClass().getMethod("getClaim", Location.class);
+                    } catch (NoSuchMethodException e1) {
+                        try {
+                            getClaim = api.getClass().getMethod("getClaimAt", Location.class);
+                        } catch (NoSuchMethodException e2) {
+                            continue;
+                        }
+                    }
+                    dominionGetClaim = getClaim;
                     enabled = true;
-                    plugin.getLogger().info("领地检测：已启用 Dominion");
+                    plugin.getLogger().info("领地检测：已启用 Dominion（API: " + className + "）");
                     return;
+                } catch (Exception ignored) {
+                    // 继续尝试下一个
                 }
-            } catch (Exception e) {
-                plugin.getLogger().log(Level.WARNING, "Dominion 检测失败（反射签名不匹配？）", e);
             }
+            plugin.getLogger().warning("Dominion 已安装但无法识别 API 类，领地检测对该插件无效。请检查 Dominion 版本或联系作者。");
         }
 
         // GriefPrevention

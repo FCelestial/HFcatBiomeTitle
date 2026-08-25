@@ -126,14 +126,16 @@ public class PlayerMoveListener implements Listener {
             return;
         }
 
+        // 冷却检查（提前到最前面：群系、区域、领地所有触发都受冷却限制，避免边界抖动反复触发）
+        if (cooldownManager.isOnCooldown(player)) return;
+
         // 领地检查（进入领地：停止拖尾 + 不显示）
         if (ignoreRes && residenceManager.isEnabled() && residenceManager.isInResidence(player, to)) {
             stopTrailTask(player);
             return;
         }
 
-        // 自定义区域优先检测（注意：区域检测在冷却之前，进入区域提示不受群系冷却影响；
-        // 冷却仍会限制同一区域重复触发频率）
+        // 自定义区域优先检测
         AreaManager.Area area = areaManager.getAreaAt(to);
         if (area != null) {
             String lastArea = lastAreas.get(uid);
@@ -146,9 +148,6 @@ public class PlayerMoveListener implements Listener {
             // 离开区域：清除记录（群系检测继续）
             lastAreas.remove(uid);
         }
-
-        // 冷却检查（群系提示）
-        if (cooldownManager.isOnCooldown(player)) return;
 
         // 获取当前群系（用 Block.getBiome() 取 3D 群系，洞穴群系才有效）
         Biome toBiome = getBiome(to);

@@ -162,7 +162,8 @@ public class DisplayManager {
 
         // 总时长结束后：取消重发任务并清除 ActionBar
         handle.clear = player.getScheduler().runDelayed(plugin, task -> {
-            actionBarHandles.remove(player.getUniqueId());
+            ActionBarHandle h = actionBarHandles.remove(player.getUniqueId());
+            if (h != null) h.cancel();
             if (player.isOnline()) {
                 player.sendActionBar(Component.text(" "));
             }
