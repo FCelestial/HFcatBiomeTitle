@@ -1,0 +1,34 @@
+# HFcatBiomeTitle 配置
+# 群系键格式：原版用 Biome 枚举名（如 PLAINS），数据包用 namespace:path（如 incendium:ash_barrens）
+# 不区分大小写匹配，支持三种写法：PLAINS / minecraft:plains / plains
+#
+# 消息格式：全部使用 MiniMessage 渐变色（<gradient:#颜色1:#颜色2>文本</gradient>）
+#   - Java 版玩家：显示完整渐变效果
+#   - 基岩版（Geyser）玩家：自动降级为 § 颜色码（渐变取起始色），无需额外配置
+#   - 兼容旧格式：&a / §a / &x&F&F&0&0&0&0 / &#ff0000 也会被自动转换
+#
+
+# 显示设置
+# 显示方式优先级（从上到下）：群系条目的 display 字段 > actionbar 开关 > default 默认值
+display:
+  # 默认显示方式：title / actionbar / subtitle / bossbar
+  default: "actionbar"
+  # 全局 ActionBar 开关（设为 true 后所有群系用 ActionBar 显示，忽略 default）
+  actionbar: true
+  # 显示时长（tick，1 tick = 0.05 秒，即 60 = 3 秒）
+  #   - title / subtitle / bossbar 模式：fadeIn 淡入 -> stay 停留 -> fadeOut 淡出
+  #   - actionbar 模式：总显示时长 = fadeIn + stay + fadeOut
+  #     （客户端约 2 秒自动消失，插件会每 2 秒重复发送直到总时长结束）
+  fadeIn: 10
+  stay: 60
+  fadeOut: 10
+
+# 冷却间隔（秒），同一玩家在此时间内不重复触发
+min-interval: 8
+
+# 在领地内不显示标题（自动检测 Dominion / GriefPrevention / Residence / Lands）
+ignore-res: true
+
+# 不显示标题的世界
+disable-worlds:
+  - "zc"

@@ -1,0 +1,29 @@
+name: HFcatBiomeTitle
+version: '${project.version}'
+main: top.miragedge.biometitle.HFcatBiomeTitle
+api-version: '1.26'
+description: 群系标题显示插件，支持数据包群系命名空间
+author: FCelestial
+softdepend:
+  - PlaceholderAPI
+  - Dominion
+  - GriefPrevention
+  - Residence
+  - Lands
+commands:
+  bt:
+    description: HFcatBiomeTitle 管理命令
+    usage: /bt <reload|get|wand|setarea|listarea|removearea>
+permissions:
+  biomestitle.admin:
+    description: 管理权限（reload/removearea），并继承 wand/setarea
+    default: op
+    children:
+      biomestitle.command.wand: true
+      biomestitle.command.setarea: true
+  biomestitle.command.wand:
+    description: 获取法杖
+    default: op
+  biomestitle.command.setarea:
+    description: 设置区域
+    default: op
